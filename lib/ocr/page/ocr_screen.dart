@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:test_ocr/ocr/page/preview_camera.dart';
 import '../bloc/ocr_bloc.dart';
 
 class OcrScreen extends StatelessWidget {
@@ -37,8 +38,17 @@ class OcrScreen extends StatelessWidget {
                     Text('NIK: ${state.nik}'),
                     SizedBox(height: 20),
                     ElevatedButton(
-                      onPressed: () {
-                        context.read<OcrBloc>().add(PickImageFromCamera());
+                      onPressed: () async {
+                        final imagePath = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CameraPreviewScreen(),
+                          ),
+                        );
+
+                        if (imagePath != null) {
+                          context.read<OcrBloc>().add(PickImageFromCameraPreview(imagePath));
+                        }
                       },
                       child: Text('Ambil Gambar dari Kamera'),
                     ),
@@ -59,8 +69,17 @@ class OcrScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton(
-                    onPressed: () {
-                      context.read<OcrBloc>().add(PickImageFromCamera());
+                    onPressed: () async {
+                      final imagePath = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CameraPreviewScreen(),
+                        ),
+                      );
+
+                      if (imagePath != null) {
+                        context.read<OcrBloc>().add(PickImageFromCameraPreview(imagePath));
+                      }
                     },
                     child: Text('Ambil Gambar dari Kamera'),
                   ),

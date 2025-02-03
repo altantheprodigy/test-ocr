@@ -16,6 +16,10 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
     on<PickImageFromGallery>((event, emit) async {
       await _processImage(ImageSource.gallery, emit);
     });
+
+    on<PickImageFromCameraPreview>((event, emit) async {
+      await _processImageFromPath(event.imagePath, emit);
+    });
   }
 
   Future<void> _processImage(ImageSource source, Emitter<OcrState> emit) async {
@@ -26,34 +30,41 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
       final pickedFile = await ImagePicker().pickImage(source: source);
 
       if (pickedFile != null) {
-        final File imageFile = File(pickedFile.path);
-
-        // Menginisialisasi text recognizer dari google_ml_kit
-        final textRecognizer = GoogleMlKit.vision.textRecognizer(script: TextRecognitionScript.latin);
-
-        // Membuat InputImage dari file
-        final inputImage = InputImage.fromFile(imageFile);
-
-        // Memproses gambar untuk mengenali teks
-        final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
-
-        // Mengekstrak NIK dari teks yang dikenali
-        String nik = _extractNikFromText(recognizedText.text);
-        // String nik = recognizedText.text;
-        print("Hasil OCR Mentah: ${recognizedText.text}");
-        print("Hasil OCR: ${nik}");
-
-        if (nik.isNotEmpty) {
-          emit(OcrSuccess(nik, imageFile: imageFile)); // Mengirim state success dengan NIK dan gambar
-        } else {
-          emit(OcrFailure('NIK tidak ditemukan')); // Mengirim state failure jika NIK tidak ditemukan
-        }
-
-        // Jangan lupa untuk menutup text recognizer setelah selesai
-        textRecognizer.close();
+        await _processImageFromPath(pickedFile.path, emit);
       } else {
         emit(OcrFailure('Gagal mengambil gambar')); // Mengirim state failure jika gambar tidak diambil
       }
+    } catch (e) {
+      emit(OcrFailure('Terjadi kesalahan: $e')); // Mengirim state failure jika terjadi error
+    }
+  }
+
+  Future<void> _processImageFromPath(String imagePath, Emitter<OcrState> emit) async {
+    try {
+      final File imageFile = File(imagePath);
+
+      // Menginisialisasi text recognizer dari google_ml_kit
+      final textRecognizer = GoogleMlKit.vision.textRecognizer(script: TextRecognitionScript.latin);
+
+      // Membuat InputImage dari file
+      final inputImage = InputImage.fromFile(imageFile);
+
+      // Memproses gambar untuk mengenali teks
+      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
+
+      // Mengekstrak NIK dari teks yang dikenali
+      String nik = _extractNikFromText(recognizedText.text);
+      print("Hasil OCR Mentah: ${recognizedText.text}");
+      print("Hasil OCR: $nik");
+
+      if (nik.isNotEmpty) {
+        emit(OcrSuccess(nik, imageFile: imageFile)); // Mengirim state success dengan NIK dan gambar
+      } else {
+        emit(OcrFailure('NIK tidak ditemukan')); // Mengirim state failure jika NIK tidak ditemukan
+      }
+
+      // Jangan lupa untuk menutup text recognizer setelah selesai
+      textRecognizer.close();
     } catch (e) {
       emit(OcrFailure('Terjadi kesalahan: $e')); // Mengirim state failure jika terjadi error
     }
@@ -66,6 +77,4 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
     final Match? match = nikRegExp.firstMatch(text);
     return match?.group(0) ?? ''; // Mengembalikan NIK jika ditemukan, atau string kosong jika tidak
   }
-
-
 }
