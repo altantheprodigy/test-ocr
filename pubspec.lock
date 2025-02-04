@@ -193,7 +193,7 @@ packages:
     source: hosted
     version: "0.9.0"
   google_mlkit_text_recognition:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: google_mlkit_text_recognition
       sha256: e7609cec8de3022680a36ead8a8bafa9fd2360ea018a728feaad12dcb0e3c177
@@ -352,6 +352,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.0"
+  ocr_nik_extractor:
+    dependency: "direct main"
+    description:
+      name: ocr_nik_extractor
+      sha256: c4016236e0ef4c5194d89a8dd15c97e63e53b3fa45ad91acac2729cc98f3e79b
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   path:
     dependency: transitive
     description:

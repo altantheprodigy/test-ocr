@@ -24,8 +24,8 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
     try {
       _cameras = await availableCameras();
       // final firstCamera = cameras.first;
-      final backCamera = _cameras.firstWhere(
-          (camera) => camera.lensDirection == CameraLensDirection.back);
+      // final backCamera = _cameras.firstWhere(
+      //     (camera) => camera.lensDirection == CameraLensDirection.back);
 
       _cameraController = CameraController(
         _cameras[0],

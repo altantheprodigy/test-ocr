@@ -1,8 +1,9 @@
 import 'dart:io';
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
-import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
+// import 'package:meta/meta.dart';
+// import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:ocr_nik_extractor/ocr_nik_extractor.dart';
 
 part 'ocr_event.dart';
 part 'ocr_state.dart';
@@ -40,17 +41,22 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
 
   Future<void> _processImageFromPath(String imagePath, Emitter<OcrState> emit) async {
     try {
+
+      final OcrNikExtractor ocrNikExtractor = OcrNikExtractor();
+
       final File imageFile = File(imagePath);
 
-      final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      // final textRecognizer = TextRecognizer(script: TextRecognitionScript.latin);
+      //
+      // final inputImage = InputImage.fromFile(imageFile);
+      //
+      // final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
 
-      final inputImage = InputImage.fromFile(imageFile);
+      // String nik = _extractNikFromText(recognizedText.text);
+      // print("Hasil OCR Mentah: ${recognizedText.text}");
 
-      final RecognizedText recognizedText = await textRecognizer.processImage(inputImage);
-
-      String nik = _extractNikFromText(recognizedText.text);
-      print("Hasil OCR Mentah: ${recognizedText.text}");
-      print("Hasil OCR: $nik");
+      final String nik = await ocrNikExtractor.extractNik(imageFile: imageFile);
+      // print("Hasil OCR: $nik");
 
       if (nik.isNotEmpty) {
         emit(OcrSuccess(nik, imageFile: imageFile));
@@ -58,15 +64,14 @@ class OcrBloc extends Bloc<OcrEvent, OcrState> {
         emit(OcrFailure('NIK tidak ditemukan'));
       }
 
-      textRecognizer.close();
     } catch (e) {
-      emit(OcrFailure('Terjadi kesalahan: $e'));
+      emit(OcrFailure('Terjadi : $e'));
     }
   }
 
-  String _extractNikFromText(String text) {
-    final RegExp nikRegExp = RegExp(r'\b\d{16}\b');
-    final Match? match = nikRegExp.firstMatch(text);
-    return match?.group(0) ?? '';
-  }
+  // String _extractNikFromText(String text) {
+  //   final RegExp nikRegExp = RegExp(r'\b\d{16}\b');
+  //   final Match? match = nikRegExp.firstMatch(text);
+  //   return match?.group(0) ?? '';
+  // }
 }
