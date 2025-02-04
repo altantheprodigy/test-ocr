@@ -12,7 +12,7 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
   late CameraController _cameraController;
   late Future<void> _initializeControllerFuture;
   bool _isCameraInitialized =
-      false; // Tambahkan flag untuk memeriksa inisialisasi kamera
+      false;
 
   @override
   void initState() {
@@ -51,12 +51,12 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
       case CameraLensDirection.back:
         return 90 *
             (3.141592653589793 /
-                180); // Rotasi 90 derajat untuk kamera belakang
+                180);
       case CameraLensDirection.front:
         return -90 *
-            (3.141592653589793 / 180); // Rotasi -90 derajat untuk kamera depan
+            (3.141592653589793 / 180);
       default:
-        return 0; // Tidak ada rotasi untuk kamera lainnya
+        return 0;
     }
   }
 
@@ -68,8 +68,6 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double size = 300;
-    // final deviceRatio = size.width / size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text('Preview Kamera'),
@@ -132,11 +130,10 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
             )
           : Center(
               child:
-                  CircularProgressIndicator()), // Tampilkan loading indicator jika belum diinisialisasi
+                  CircularProgressIndicator()),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           try {
-            // Pastikan kamera sudah diinisialisasi sebelum mengambil gambar
             if (!_isCameraInitialized) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Kamera belum siap')),
@@ -144,10 +141,8 @@ class _CameraPreviewScreenState extends State<CameraPreviewScreen> {
               return;
             }
 
-            // Ambil gambar
             final image = await _cameraController.takePicture();
 
-            // Kembali ke halaman sebelumnya dengan path gambar
             Navigator.pop(context, image.path);
           } catch (e) {
             print('Error mengambil gambar: $e');
